@@ -1,23 +1,48 @@
-import logo from './logo.svg';
 import './App.css';
+import FoodComponent from './Components/FoodComponent';
+import { useEffect, useState } from 'react';
+import MenuData from './Data/MenuData';
 
 function App() {
+  const [foodData, setFoodData] = useState(MenuData)
+  const [dataInPage,setDataInPage] =useState([])
+  const [page,setPage] = useState(0)
+
+  const pagination = () => {
+    const foodPerPage = 3
+    const pages = Math.ceil(MenuData.length/ foodPerPage)
+    console.log('page per food',pages);
+    const newFood = Array.from({length:pages},(data,index)=>{
+      const start = index * foodPerPage //[0,], [7,]
+      return MenuData.slice(start,start+foodPerPage)
+    })
+    return newFood
+  }
+
+  const handlePage =(index)=>{
+    setPage(index)
+  }
+
+  useEffect(()=>{
+   const paginate = pagination()
+   setDataInPage(paginate)
+   setFoodData(paginate[page])
+  },[page])
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="app">
+      <h1>Food Cart | Pagination</h1>
+      <div className='container'>
+        {foodData.map((data, index) => {
+          return <FoodComponent key={index} {...data} />
+        })}
+      </div>
+      <div className='pagination-container'>
+          {dataInPage.map((data,index)=>{
+            return (
+              <button key={index} className={`page-btn ${index === page ? "active-btn" : null}`} onClick={()=>handlePage(index)}>{index+1}</button>
+            )
+          })}
+      </div>
     </div>
   );
 }
